@@ -5,6 +5,7 @@
             [compojure.route :as route]
             [compojure.handler :refer [site]]
             [ring.middleware.file-info :refer [wrap-file-info]]
+            [ring.util.response :refer [file-response]]
             [clojure.tools.logging :refer [info]]
             [clojure.data.json :refer [json-str read-json]]
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
@@ -42,7 +43,8 @@
       ;; send all, client will filter them
       (send! client (json-str @all-msgs)))))
 
-(defn lobby-handler [request]
+(defn ws-lobby-handler [request]
+  (info "ws-lobby-handler")
   (with-channel request channel
     (info channel "connected")
     (swap! clients assoc channel true)
@@ -51,10 +53,23 @@
                         (swap! clients dissoc channel)
                         (info channel "closed, status" status)))))
 
+(defn lobby-index-handler [request]
+  (let [f1 (file-response "index.html" {:root "resources/public"})
+        f2 (file-response "resources/public/index.html")
+        f3 (file-response "resources/public/html/index.html")
+       ]
+    (info request)
+    (info f1)
+    (info f2)
+    f2))
+
 (defroutes all-routes
-  (GET "/ws-lobby" []  lobby-handler)
+  (GET "/"         [] lobby-index-handler)
+  ;(GET "/argh"     [] lobby-index-handler)
+  (GET "/ws-lobby" [] ws-lobby-handler)
   (route/files "" {:root "resources/public"})
-  (route/not-found "<p>Page not found.</p>" ))
+  (route/not-found "<p>Page not found.</p>" )
+)
 
 (defn- wrap-request-logging [handler]
   (fn [{:keys [request-method uri] :as req}]
@@ -65,5 +80,9 @@
       resp)))
 
 (defn -main [& args]
-  (run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
-  (info "server started. http://127.0.0.1:9899"))
+  ;(run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
+  (run-server (-> #'all-routes
+                  site
+                  wrap-request-logging)
+              {:port 9899})
+  (info "server started. http://127.0.0.1:9899" (System/getProperty "user.dir")))

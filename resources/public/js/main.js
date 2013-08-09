@@ -1,6 +1,6 @@
 (function($) {
   function bindEvents() {
-    var socket = new WebSocket('ws://localhost:9899/ws-lobby/');
+    var socket = new WebSocket('ws://localhost:9899/ws-lobby');
     socket.onopen = function() {
       console.log('onopen');
       enableButton();
@@ -16,7 +16,7 @@
       enableButton();
     };
 
-    $button.on('click', function(evt) {
+    $('#join-game').on('click', function(evt) {
       var username = $('#username').val();
       disableButton();
       joinGame(socket, username);
