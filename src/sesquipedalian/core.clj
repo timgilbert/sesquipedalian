@@ -1,14 +1,18 @@
 ; Based on https://github.com/http-kit/chat-websocket/blob/master/src/main.clj
 (ns sesquipedalian.core
   (:gen-class)
-  (:use org.httpkit.server
-        [ring.middleware.file-info :only [wrap-file-info]]
-        [clojure.tools.logging :only [info]]
-        [clojure.data.json :only [json-str read-json]]
-        (compojure [core :only [defroutes GET POST]]
-                   [route :only [files not-found]]
-                   [handler :only [site]]
-                   [route :only [not-found]])))
+  (:require [compojure.core :refer [defroutes GET POST]]
+            [compojure.route :as route]
+            [compojure.handler :refer [site]]
+            [ring.middleware.file-info :refer [wrap-file-info]]
+            [clojure.tools.logging :refer [info]]
+            [clojure.data.json :refer [json-str read-json]]
+            [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
+  ; (:use org.httpkit.server
+  ;       (compojure [core :only [defroutes GET POST]]
+  ;                  [route :only [files not-found]]
+  ;                  [handler :only [site]]
+  ;                  [route :only [not-found]])))
 
 (defn- now [] (quot (System/currentTimeMillis) 1000))
 
@@ -38,8 +42,8 @@
       ;; send all, client will filter them
       (send! client (json-str @all-msgs)))))
 
-(defn lobby-handler [req]
-  (with-channel req channel
+(defn lobby-handler [request]
+  (with-channel request channel
     (info channel "connected")
     (swap! clients assoc channel true)
     (on-receive channel #'mesg-received)
@@ -47,10 +51,10 @@
                         (swap! clients dissoc channel)
                         (info channel "closed, status" status)))))
 
-(defroutes chartrootm
-  (GET "/ws/lobby" []  lobby-handler)
-  (files "" {:root "resources/public"})
-  (not-found "<p>Page not found.</p>" ))
+(defroutes all-routes
+  (GET "/ws-lobby" []  lobby-handler)
+  (route/files "" {:root "resources/public"})
+  (route/not-found "<p>Page not found.</p>" ))
 
 (defn- wrap-request-logging [handler]
   (fn [{:keys [request-method uri] :as req}]
@@ -61,5 +65,5 @@
       resp)))
 
 (defn -main [& args]
-  (run-server (-> #'chartrootm site wrap-request-logging) {:port 9899})
+  (run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
   (info "server started. http://127.0.0.1:9899"))

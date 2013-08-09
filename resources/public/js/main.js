@@ -1,6 +1,6 @@
 (function($) {
   function bindEvents() {
-    var socket = new WebSocket('ws://localhost:9899/ws/lobby/');
+    var socket = new WebSocket('ws://localhost:9899/ws-lobby/');
     socket.onopen = function() {
       console.log('onopen');
       enableButton();
