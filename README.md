@@ -1,19 +1,22 @@
 # sesquipedalian
 
-FIXME
+This implementation uses clojure's http-kit library on the back-end.  It's based
+on the approach outlined [in this blog post][blog]
 
 ## Prerequisites
 
-You will need [Leiningen][1] 1.7.0 or above installed.
+You will need [Leiningen][lein] 1.7.0 or above installed.
 
-[1]: https://github.com/technomancy/leiningen
+    $ brew install lein
 
 ## Running
 
-To start a web server for the application, run:
+To start a web server for the application:
 
-    lein ring server
+    $ lein run
+    #<server$run_server$stop_server__602 org.httpkit.server$run_server$stop_server__602@6f967348>
 
-## License
+Once the above line appears, the server is serving on http://localhost:8080/.
 
-Copyright © 2013 FIXME
+[lein]: https://github.com/technomancy/leiningen
+[blog]: http://samrat.me/blog/2013/07/clojure-websockets-with-http-kit/#comments

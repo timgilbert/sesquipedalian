@@ -1,25 +1,39 @@
 (ns sesquipedalian.core
-  (:use [lamina.core]
-        [aleph.http]
-        [compojure.core])
+  (:use [compojure.core :only (defroutes GET)]
+        ring.util.response
+        ring.middleware.cors
+        org.httpkit.server)
   (:require [compojure.route :as route]
-            [ring.util.response :as response])
-  (:gen-class))
+            [compojure.handler :as handler]
+            [ring.middleware.reload :as reload]
+            [cheshire.core :refer :all]))
 
-(def broadcast-channel (channel))
+(def clients (atom {}))
 
-(defn chat-handler [ch handshake]
-  (receive ch
-           (fn [name]
-             (siphon (map* #(str name ": " %) ch) broadcast-channel)
-             (siphon broadcast-channel ch))))
+(defn ws
+  [req]
+  (with-channel req con
+    (swap! clients assoc con true)
+    (println con " connected")
+    (on-close con (fn [status]
+                    (swap! clients dissoc con)
+                    (println con " disconnected. status: " status)))))
 
-(defroutes my-routes
-  (GET "/chat/" [] (wrap-aleph-handler chat-handler))
-  (GET "/" [] (response/file-response "index.html" {:root "resources/public"}))
-  (route/not-found "Page not found"))
+(future (loop []
+          (doseq [client @clients]
+            (send! (key client) (generate-string
+                                 {:happiness (rand 10)})
+                   false))
+          (Thread/sleep 5000)
+          (recur)))
 
-(defn -main
-  [& args]
-  (start-http-server (wrap-ring-handler my-routes)
-                     {:port 8080 :websocket true}))
+(defroutes routes
+  (GET "/happiness" [] ws))
+
+(def application (-> (handler/site routes)
+                     reload/wrap-reload
+                     (wrap-cors
+                      :access-control-allow-origin #".+")))
+
+(defn -main [& args]
+  (run-server application {:port 8080 :join? false}))
