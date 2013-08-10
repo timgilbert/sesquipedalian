@@ -1,19 +1,16 @@
 ; Based on https://github.com/http-kit/chat-websocket/blob/master/src/main.clj
 (ns sesquipedalian.core
   (:gen-class)
-  (:require [compojure.core :refer [defroutes GET POST]]
+  (:require [sesquipedalian.game :as game]
+            [compojure.core :refer [defroutes GET POST]]
             [compojure.route :as route]
             [compojure.handler :refer [site]]
             [ring.middleware.file-info :refer [wrap-file-info]]
+            [ring.middleware.reload :refer [wrap-reload]]
             [ring.util.response :refer [file-response]]
             [clojure.tools.logging :refer [info]]
             [clojure.data.json :refer [json-str read-json]]
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
-  ; (:use org.httpkit.server
-  ;       (compojure [core :only [defroutes GET POST]]
-  ;                  [route :only [files not-found]]
-  ;                  [handler :only [site]]
-  ;                  [route :only [not-found]])))
 
 (defn- now [] (quot (System/currentTimeMillis) 1000))
 
@@ -44,32 +41,22 @@
       (send! client (json-str @all-msgs)))))
 
 (defn ws-lobby-handler [request]
-  (info "ws-lobby-handler")
-  (with-channel request channel
-    (info channel "connected")
-    (swap! clients assoc channel true)
-    (on-receive channel #'mesg-received)
-    (on-close channel (fn [status]
-                        (swap! clients dissoc channel)
-                        (info channel "closed, status" status)))))
-
-(defn lobby-index-handler [request]
-  (let [f1 (file-response "index.html" {:root "resources/public"})
-        f2 (file-response "resources/public/index.html")
-        f3 (file-response "resources/public/html/index.html")
-       ]
-    (info request)
-    (info f1)
-    (info f2)
-    f2))
+  (let [new-game (game/new-game "xyzzy")]
+    (info "ws-lobby-handler" new-game)
+    (with-channel request channel
+      (info channel "connected")
+      (swap! clients assoc channel true)
+      (on-receive channel mesg-received)
+      (on-close channel (fn [status]
+                          (swap! clients dissoc channel)
+                          (info channel "closed, status" status))))))
 
 (defroutes all-routes
-  (GET "/"         [] lobby-index-handler)
-  ;(GET "/argh"     [] lobby-index-handler)
-  (GET "/ws-lobby" [] ws-lobby-handler)
+  (GET "/"         [] (file-response "resources/public/index.html"))
+  (GET "/game/:id" [] (file-response "resources/public/game.html"))
+  (GET "/ws/lobby" [] ws-lobby-handler)
   (route/files "" {:root "resources/public"})
-  (route/not-found "<p>Page not found.</p>" )
-)
+  (route/not-found "<p>Page not found.</p>" ))
 
 (defn- wrap-request-logging [handler]
   (fn [{:keys [request-method uri] :as req}]
@@ -80,9 +67,14 @@
       resp)))
 
 (defn -main [& args]
-  ;(run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
-  (run-server (-> #'all-routes
-                  site
-                  wrap-request-logging)
-              {:port 9899})
-  (info "server started. http://127.0.0.1:9899" (System/getProperty "user.dir")))
+  (let [port 9899]
+    (run-server (->
+                 #'all-routes
+                 site
+                 wrap-reload
+                 wrap-request-logging) {:port port})
+    ;(run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
+    ;(run-server (-> (wrap-reload '(site #'all-routes))
+    ;                wrap-request-logging)
+    ;            {:port 9899})
+    (info "server started on" "" port)))

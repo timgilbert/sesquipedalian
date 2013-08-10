@@ -18,5 +18,11 @@ To start a web server for the application:
 
 Once the above line appears, the server is serving on http://localhost:8080/.
 
+## TODO:
+
+- Back-end in Mongo or whatnot
+- Script to store dict.txt in that, maybe based on [SCOWL][scowl].
+
 [lein]: https://github.com/technomancy/leiningen
 [blog]: http://samrat.me/blog/2013/07/clojure-websockets-with-http-kit/#comments
+[scowl]: http://wordlist.sourceforge.net/
