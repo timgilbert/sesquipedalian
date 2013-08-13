@@ -6,7 +6,8 @@
       enableButton();
     };
     socket.onmessage = function(evt) {
-      console.log('onmessage', evt);
+      var data = JSON.parse(evt.data);
+      console.log('onmessage', data);
     };
     socket.onclose = function() {
       console.log('onclose');

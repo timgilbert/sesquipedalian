@@ -1,7 +1,7 @@
 ; Based on https://github.com/http-kit/chat-websocket/blob/master/src/main.clj
 (ns sesquipedalian.server
-  (:gen-class)
   (:require [sesquipedalian.game :as game]
+            [sesquipedalian.lobby :as lobby]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :as route]
             [compojure.handler :refer [site]]
@@ -26,9 +26,11 @@
                          :author "system"}]))
 
 (defn mesg-received [msg]
-  (let [data (read-json msg)]
-    (info "mesg received" data)
-    (when (:msg data)
+  (let [data (read-json msg)
+        game (lobby/user-ready data)]
+    (info "data: " data)
+    (info "game: " game)
+    (when (:id data)
       (let [data (merge data {:time (now) :id (next-id)})]
         (dosync
          (let [all-msgs* (conj @all-msgs data)
