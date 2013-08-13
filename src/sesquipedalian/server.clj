@@ -1,5 +1,5 @@
 ; Based on https://github.com/http-kit/chat-websocket/blob/master/src/main.clj
-(ns sesquipedalian.core
+(ns sesquipedalian.server
   (:gen-class)
   (:require [sesquipedalian.game :as game]
             [compojure.core :refer [defroutes GET POST]]

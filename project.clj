@@ -9,7 +9,5 @@
                  [ring/ring-core "1.2.0"]
                  [ring/ring-devel "1.2.0"]
                  [ring/ring-json "0.2.0"]
-                 [ring-cors "0.1.0"]
-                 [http-kit "2.1.8"]
-                 [cheshire "5.2.0"]]
-  :main sesquipedalian.core)
+                 [http-kit "2.1.8"]]
+  :main sesquipedalian.server)
