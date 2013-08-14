@@ -8,39 +8,24 @@
             [ring.middleware.file-info :refer [wrap-file-info]]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.util.response :refer [file-response]]
-            [clojure.tools.logging :refer [info]]
+            [clojure.tools.logging :refer [info debug]]
             [clojure.data.json :refer [json-str read-json]]
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
 
-(defn- now [] (quot (System/currentTimeMillis) 1000))
+;; TODO
+; keep username -> socket map of clients
+; when game appears, send it to all users
 
 (def clients (atom {}))                 ; a hub, a map of client => sequence number
 
-(let [max-id (atom 0)]
-  (defn next-id []
-    (swap! max-id inc)))
-
-(defonce all-msgs (ref [{:id (next-id),            ; all message, in a list
-                         :time (now)
-                         :msg "this is a live chatroom, have fun",
-                         :author "system"}]))
-
-(defn mesg-received [msg]
+(defn waiting [msg channel]
   (let [data (read-json msg)
+        username (:username data)
         game (lobby/user-ready data)]
-    (info "data: " data)
-    (info "game: " game)
-    (when (:id data)
-      (let [data (merge data {:time (now) :id (next-id)})]
-        (dosync
-         (let [all-msgs* (conj @all-msgs data)
-               total (count all-msgs*)]
-           (if (> total 100)
-             (ref-set all-msgs (vec (drop (- total 100) all-msgs*)))
-             (ref-set all-msgs all-msgs*))))))
-    (doseq [client (keys @clients)]
-      ;; send all, client will filter them
-      (send! client (json-str @all-msgs)))))
+    (debug "data:" data "game:" game)
+    (when (:id game)
+      (debug "Transfering to game" (:id game))
+      (send! channel (json-str game)))))
 
 (defn ws-lobby-handler [request]
   (let [new-game (game/new-game "xyzzy")]
@@ -48,7 +33,8 @@
     (with-channel request channel
       (info channel "connected")
       (swap! clients assoc channel true)
-      (on-receive channel mesg-received)
+      (on-receive channel (fn [data]
+                              (waiting data channel)))
       (on-close channel (fn [status]
                           (swap! clients dissoc channel)
                           (info channel "closed, status" status))))))
@@ -75,8 +61,4 @@
                  site
                  wrap-reload
                  wrap-request-logging) {:port port})
-    ;(run-server (-> #'all-routes site wrap-request-logging) {:port 9899})
-    ;(run-server (-> (wrap-reload '(site #'all-routes))
-    ;                wrap-request-logging)
-    ;            {:port 9899})
-    (info "server started on" "" port)))
+    (info "server started on" (format "http://localhost:%d/" port))))

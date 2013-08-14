@@ -3,7 +3,7 @@
             [clojure.tools.logging :refer [info]]))
 
 (def max-users-per-game 4)
-(def min-users-per-game 3)
+(def min-users-per-game 2)
 
 (let [game-id (atom 0)]
   (defn next-game-id! []

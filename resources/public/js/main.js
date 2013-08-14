@@ -8,6 +8,7 @@
     socket.onmessage = function(evt) {
       var data = JSON.parse(evt.data);
       console.log('onmessage', data);
+      redirectToGamePage(data);
     };
     socket.onclose = function() {
       console.log('onclose');
@@ -38,6 +39,11 @@
     console.log(username);
     var request = {'username': username};
     socket.send(JSON.stringify(request));
+  }
+
+  function redirectToGamePage(data) {
+    var url = '/game/' + data.id;
+    window.location.href = url;
   }
 
   disableButton();
