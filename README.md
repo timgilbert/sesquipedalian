@@ -34,6 +34,7 @@ Alternately, session cookie with username or something?
 
 - Back-end in Mongo or whatnot
 - Script to store dict.txt in that, maybe based on [SCOWL][scowl].
+- Integration with NYT regi account
 
 # Data flow
 
@@ -95,6 +96,14 @@ Here I'll try to document the network traffic of the game.
 
    6. If not, sends back `{"error": "'compute' is not longer than 'computers'"}`
 
+7. When time runs out, server sends `{"game": "over"}` or similar to users
+
+   This packet will also contain the name of the winning user and the scores.
+   The client of the winning user can display like fireworks or something.
+   The user can return to the lobby from there.
+
+   The server should be recording wins and losses in a persistent store of some
+   kind, and there should be a high-score page.
 
 [lein]: https://github.com/technomancy/leiningen
 [blog]: http://samrat.me/blog/2013/07/clojure-websockets-with-http-kit/#comments
