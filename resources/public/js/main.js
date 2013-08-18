@@ -1,25 +1,27 @@
 (function($) {
   function bindEvents() {
-    var socket = new WebSocket('ws://localhost:9899/ws/lobby');
-    socket.onopen = function() {
-      console.log('onopen');
-      enableButton();
-    };
-    socket.onmessage = function(evt) {
-      var data = JSON.parse(evt.data);
-      console.log('onmessage', data);
-      redirectToGamePage(data);
-    };
-    socket.onclose = function() {
-      console.log('onclose');
-    };
-    socket.onerror = function(error) {
-      console.log('onerror', error);
-      enableButton();
-    };
-
+    disableButton();
     $('#join-game').on('click', function(evt) {
       var username = $('#username').val();
+      var socket = new WebSocket('ws://localhost:9899/ws/lobby');
+
+      socket.onopen = function() {
+        console.log('onopen');
+        enableButton();
+      };
+      socket.onmessage = function(evt) {
+        var data = JSON.parse(evt.data);
+        console.log('onmessage', data);
+        redirectToGamePage(data);
+      };
+      socket.onclose = function() {
+        console.log('onclose');
+      };
+      socket.onerror = function(error) {
+        console.log('onerror', error);
+        enableButton();
+      };
+
       disableButton();
       joinGame(socket, username);
     });
@@ -46,7 +48,6 @@
     window.location.href = url;
   }
 
-  disableButton();
   bindEvents();
 
 })(jQuery);

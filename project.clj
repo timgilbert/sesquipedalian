@@ -11,4 +11,9 @@
                  [ring/ring-json "0.2.0"]
                  [http-kit "2.1.8"]]
   :dev-dependencies [[lein-autodoc "0.9.0"]]
-  :main sesquipedalian.server)
+  :main sesquipedalian.server
+  ; :profiles {:dev {:dependencies [[speclj "2.5.0"]]}}
+  ; :plugins [[speclj "2.5.0"]]
+  ; :test-paths ["spec"]
+
+  )

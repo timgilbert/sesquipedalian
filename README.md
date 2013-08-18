@@ -1,20 +1,20 @@
 # sesquipedalian
 
-This implementation uses clojure's http-kit library on the back-end.  It's based
-on the approach outlined [in this blog post][blog]
+This implementation uses the [Clojure][clojure] [http-kit][http-kit] library
+on the back-end.  It's based on the approach outlined [in this blog post][blog].
 
 ## Prerequisites
 
 You will need [Leiningen][lein] 1.7.0 or above installed.
 
-    $ brew install lein
+    $ brew install leiningen
 
 ## Running
 
 To start a web server for the application:
 
     $ lein run
-    17:09:46 INFO  sesquipedalian.server - server started on  9899
+    10:13:10 INFO  sesquipedalian.server - server started on http://localhost:9899/
 
 Once the above line appears, the server is serving on [http://localhost:9899/][local].
 You can open mutliple browser tabs, enter a username, and hit "join game" - once three
@@ -54,7 +54,7 @@ Here I'll try to document the network traffic of the game.
    Specifically, down the road it might have some kind of token generated
    by the server or a similar authentication method.
 
-5. When client gets the json packet, it constructs a URL based ont he game ID
+5. When client gets the json packet, it constructs a URL based on the game ID
    and redirects the browser to that ID (eg, /game/123).
 
 ## Game page
@@ -109,3 +109,5 @@ Here I'll try to document the network traffic of the game.
 [blog]: http://samrat.me/blog/2013/07/clojure-websockets-with-http-kit/#comments
 [scowl]: http://wordlist.sourceforge.net/
 [local]: http://localhost:9899/
+[http-kit]: http://http-kit.org/
+[clojure]: http://clojure.org/

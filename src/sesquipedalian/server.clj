@@ -19,6 +19,7 @@
 (def clients (atom {}))                 ; a hub, a map of client => sequence number
 
 (defn waiting [msg channel]
+  "Called when a user indicates they are waiting for a game"
   (let [data (read-json msg)
         username (:username data)
         game (lobby/user-ready data)]
@@ -28,16 +29,15 @@
       (send! channel (json-str game)))))
 
 (defn ws-lobby-handler [request]
-  (let [new-game (game/new-game "xyzzy")]
-    (info "ws-lobby-handler" new-game)
-    (with-channel request channel
-      (info channel "connected")
-      (swap! clients assoc channel true)
-      (on-receive channel (fn [data]
-                              (waiting data channel)))
-      (on-close channel (fn [status]
-                          (swap! clients dissoc channel)
-                          (info channel "closed, status" status))))))
+  "Handler for web-socket requests to /ws/lobby"
+  (with-channel request channel
+    (info channel "connected")
+    (swap! clients assoc channel true)
+    (on-receive channel (fn [data]
+                            (waiting data channel)))
+    (on-close channel (fn [status]
+                        (swap! clients dissoc channel)
+                        (info channel "closed, status" status)))))
 
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))
@@ -62,3 +62,4 @@
                  wrap-reload
                  wrap-request-logging) {:port port})
     (info "server started on" (format "http://localhost:%d/" port))))
+
