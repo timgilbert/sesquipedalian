@@ -1,15 +1,21 @@
 (ns sesquipedalian.t-websockets
-  (:require [clojure.test :refer :all]
-            [midje.sweet :refer :all]
+  (:require [midje.sweet :refer :all]
             [sesquipedalian.websockets :as ws]))
 
 (def fake-socket :fake-web-socket)
 
-(facts "About ws"
-  (let [empty (ws/new-name-pool)
-        single (ws/add-anonymous-member empty fake-socket)
-        single-named (ws/name-member single :test-name fake-socket)
-        single-removed (ws/remove-member single-named fake-socket)]
+(let [empty (ws/new-name-pool)
+      single (ws/add-anonymous-member empty fake-socket)
+      single-named (ws/name-member single :test-name fake-socket)
+      single-removed (ws/remove-member single-named fake-socket)
+      moar (-> (ws/new-name-pool)
+               (ws/add-anonymous-member 5)
+               (ws/name-member :five 5)
+               (ws/add-anonymous-member 10)
+               (ws/name-member :ten 10)
+               (ws/add-anonymous-member 15)
+               (ws/name-member :fifteen 15))]
+  (facts "About ws"
     (fact "Get anonymous returns single value"
       (count (ws/get-anonymous-members single)) => 1)
     (fact "Get anonymous returns actual value"

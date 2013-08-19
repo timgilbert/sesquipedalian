@@ -6,6 +6,9 @@
 (defn find-key-for [map value]
   (first (for [[k v] map :when (= v value)] k)))
 
+(defn subset-of [map name-set]
+  (hash-map (for [[k v] map :when (name-set k)] [k v])))
+
 (defn new-name-pool []
   "Returns a new empty client list"
   (make-name-pool #{} {}))
@@ -29,5 +32,5 @@
 (defn get-named-member [[anon named] name]
   (named name))
 
-(defn map-to-named-sockets [[anon named] names f]
-  [anon named])
+(defn map-to-named-members [[anon named] names f]
+  [anon (map f (subset-of named names))])
