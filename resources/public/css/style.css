@@ -1,2 +1,12 @@
 /* style.css */
 
+ul.letters {
+  overflow: auto;
+  list-style-type: none;
+}
+ul.letters li {
+  float: left;
+  margin-right: 20px;
+  border: 1px solid #aaa;
+  padding: 10px 20px;
+}

@@ -1,8 +1,9 @@
 (function($) {
   function bindEvents() {
 
-    $('#join-game').keyup(function(evt) {
-      console.log($('#username').val());
+    // this doesn't seem to work
+    $('#join-game').on("keyup", function(evt) {
+      console.log('aargh', $('#username').val());
       if ($('#username').val() === "") {
         disableButton('Join Game');
       } else {
@@ -12,7 +13,7 @@
 
     $('#join-game').click(function(evt) {
       var username = $('#username').val();
-      var socket = new WebSocket('ws://localhost:9899/ws/lobby');
+      var socket = new WebSocket('ws://localhost:9899/ws/MOCK/lobby');
       disableButton('Waiting...');
 
       socket.onopen = function() {
@@ -59,6 +60,6 @@
     window.location.href = url;
   }
 
-  bindEvents();
+  $(function() { bindEvents(); });
 
 })(jQuery);
