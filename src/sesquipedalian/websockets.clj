@@ -1,4 +1,6 @@
 (ns sesquipedalian.websockets
+  "Defines a series of routines for operating on named pools,
+  where members may be either anonymous or named."
   (:require [clojure.tools.logging :refer [debug]]))
 
 (defn- make-name-pool [anons named] [anons named])
@@ -10,7 +12,7 @@
   (hash-map (for [[k v] map :when (name-set k)] [k v])))
 
 (defn new-name-pool []
-  "Returns a new empty client list"
+  "Returns a new empty pool, with no named or anonymous members."
   (make-name-pool #{} {}))
 
 (defn get-anonymous-members [[anon named]] anon)

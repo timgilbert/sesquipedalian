@@ -1,13 +1,24 @@
 (function($) {
   function bindEvents() {
-    disableButton();
-    $('#join-game').on('click', function(evt) {
+
+    $('#join-game').keyup(function(evt) {
+      console.log($('#username').val());
+      if ($('#username').val() === "") {
+        disableButton('Join Game');
+      } else {
+        enableButton();
+      }
+    });
+
+    $('#join-game').click(function(evt) {
       var username = $('#username').val();
       var socket = new WebSocket('ws://localhost:9899/ws/lobby');
+      disableButton('Waiting...');
 
       socket.onopen = function() {
         console.log('onopen');
         enableButton();
+        joinGame(socket, username);
       };
       socket.onmessage = function(evt) {
         var data = JSON.parse(evt.data);
@@ -23,8 +34,8 @@
       };
 
       disableButton();
-      joinGame(socket, username);
     });
+    //disableButton('Join Game');
   }
 
   function enableButton() {
@@ -32,9 +43,9 @@
     $('#join-game').text('Join Game');
   }
 
-  function disableButton() {
+  function disableButton(str) {
     $('#join-game').attr('disabled', true);
-    $('#join-game').text('Waiting...');
+    $('#join-game').text(str);
   }
 
   function joinGame(socket, username) {
