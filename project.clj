@@ -9,12 +9,8 @@
                  [ring/ring-core "1.2.0"]
                  [ring/ring-devel "1.2.0"]
                  [ring/ring-json "0.2.0"]
-                 [http-kit "2.1.8"]]
+                 [http-kit "2.1.10"]]
   :dev-dependencies [[lein-autodoc "0.9.0"]
                      [midje "1.5.1"]]
   :main sesquipedalian.server
-  :profiles {:dev {:dependencies [[midje "1.5.1"]]}}
-  ; :plugins [[speclj "2.5.0"]]
-  ; :test-paths ["spec"]
-
-  )
+  :profiles {:dev {:dependencies [[midje "1.5.1"]]}})
