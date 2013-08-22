@@ -10,7 +10,7 @@
     console.log("beginGame", data);
   }
   function submitGuess(socket, guess) {
-    socket.send(JSON.stringify({"guess": guess}))
+    socket.send(JSON.stringify({"guess": guess}));
   }
 
   $(function() {
