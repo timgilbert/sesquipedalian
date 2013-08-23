@@ -14,31 +14,33 @@
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
 
 ;; TODO
-; keep username -> socket map of clients
 ; when game appears, send it to all users
 
 (def clients (atom {}))                 ; a hub, a map of client => sequence number
 
+(defn send-redirect [game-id username channel]
+  "Send a JSON packet down the channel which tells the user to redirect to a game page"
+  (send! channel (json-str {:id game-id})))
+
 (defn lobby-waiting [msg channel]
   "Called when a user indicates they are waiting for a game"
   (let [data (read-json msg)
-        username (:username data)
-        game (lobby/user-ready data)]
-    (debug "data:" data "game:" game)
-    (when (:id game)
-      (debug "Transfering to game" (:id game))
-      (send! channel (json-str game)))))
+        username (:username data)]
+    (lobby/name-channel! channel username)
+    (debug "data:" data)
+    (when-let [users (lobby/available-players)]
+      (lobby/create-new-game! users send-redirect))))
 
 (defn ws-lobby-handler [waiting-function request]
   "Per-socket handler for requests to /ws/lobby"
   (with-channel request channel
     (info channel "connected")
-    (lobby/add-anonymous-channel channel)
+    (lobby/add-anonymous-channel! channel)
     (on-receive channel (fn [data]
                             (waiting-function data channel)))
     (on-close channel (fn [status]
                         (info channel "closed, status" status)
-                        (lobby/remove-channel channel channel)))))
+                        (lobby/remove-channel! channel channel)))))
 
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))
@@ -66,4 +68,3 @@
                  wrap-reload
                  wrap-request-logging) {:port port})
     (info "server started on" (format "http://localhost:%d/" port))))
-

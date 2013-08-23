@@ -20,7 +20,7 @@
 
 (defn get-anonymous-members [[anon named]] anon)
 
-(defn get-named-members [[anon named]] name)
+(defn get-named-members [[anon named]] named)
 
 (defn add-anonymous-member [[anon named] new-item]
   ;; TODO: check whether new-item is already present
