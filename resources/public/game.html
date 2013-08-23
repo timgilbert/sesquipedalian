@@ -1,3 +1,4 @@
+<!doctype html>
 <html><head>
   <title>Sesquipedalian: Game</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -8,13 +9,13 @@
 </head>
 
   <body>
-    <section>
-      <h1>Sesquipedalian: game</h1>
+    <h1>Sesquipedalian: game</h1>
 
-      <div id="countdown">Countdown: <span id="time">60</span> seconds remaining</div>
+    <div id="countdown">Countdown: <span id="time">60</span> seconds remaining</div>
 
+    <div id="letters">
       <h2>Letters</h2>
-      <ul id="letters" class="letters">
+      <ul id="letter-list" class="letters">
         <li>C</li>
         <li>O</li>
         <li>M</li>
@@ -24,11 +25,28 @@
         <li>E</li>
         <li>R</li>
       </ul>
+    </div>
 
+    <div id="guess">
       <h2>Your Guess</h2>
       <input id="word" placeholder="Find a word"/>
       <button id="guess">Submit Answer</button>
-    </section>
+    </div>
+
+    <div id="opponents">
+      <h2>Opponents</h2>
+      <ul id="opponent-list">
+      </ul>
+    </div>
+
+    <div id="templates" hidden>
+      <ul>
+        <li class="opponent"></li>
+      </ul>
+      <ul>
+        <li class="letter"></li>
+      </ul>
+    </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>

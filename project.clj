@@ -13,4 +13,5 @@
   :dev-dependencies [[lein-autodoc "0.9.0"]
                      [midje "1.5.1"]]
   :main sesquipedalian.server
-  :profiles {:dev {:dependencies [[midje "1.5.1"]]}})
+  :profiles {:dev {:dependencies [[midje "1.5.1"]]
+                   :plugins [[lein-midje "3.1.1"]]}})

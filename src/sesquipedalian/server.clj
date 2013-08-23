@@ -30,15 +30,15 @@
       (send! channel (json-str game)))))
 
 (defn ws-lobby-handler [waiting-function request]
-  "Handler for web-socket requests to /ws/lobby"
+  "Per-socket handler for requests to /ws/lobby"
   (with-channel request channel
     (info channel "connected")
-    (swap! clients assoc channel true)
+    (lobby/add-anonymous-channel channel)
     (on-receive channel (fn [data]
                             (waiting-function data channel)))
     (on-close channel (fn [status]
-                        (swap! clients dissoc channel)
-                        (info channel "closed, status" status)))))
+                        (info channel "closed, status" status)
+                        (lobby/remove-channel channel channel)))))
 
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))

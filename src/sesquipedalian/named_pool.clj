@@ -1,28 +1,35 @@
-(ns sesquipedalian.websockets
+(ns sesquipedalian.named-pool
   "Defines a series of routines for operating on named pools,
   where members may be either anonymous or named."
   (:require [clojure.tools.logging :refer [debug]]))
 
 (defn- make-name-pool [anons named] [anons named])
 
-(defn find-key-for [map value]
-  (first (for [[k v] map :when (= v value)] k)))
+(defn find-key-for [m value]
+  "Search the map m for a value value. If found, return the corresponding key
+  in m.  Otherwise, return nil."
+  (first (for [[k v] m :when (= v value)] k)))
 
-(defn subset-of [map name-set]
-  (hash-map (for [[k v] map :when (name-set k)] [k v])))
+(defn subset-of [m name-set]
+  "Select the subset of the map m whose keys are in the set name-set"
+  (hash-map (for [[k v] m :when (name-set k)] [k v])))
 
-(defn new-name-pool []
+(defn new-named-pool []
   "Returns a new empty pool, with no named or anonymous members."
   (make-name-pool #{} {}))
 
 (defn get-anonymous-members [[anon named]] anon)
 
+(defn get-named-members [[anon named]] name)
+
 (defn add-anonymous-member [[anon named] new-item]
+  ;; TODO: check whether new-item is already present
   [(conj anon new-item) named])
 
 (defn name-member [[anon named] name item]
+  ;; TODO: handle case where name not in anon
   [(disj anon item)
-   (assoc named name item )])
+   (assoc named name item)])
 
 (defn remove-member [[anon named] former-item]
   (let [new-anon  (disj anon former-item)

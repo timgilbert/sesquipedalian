@@ -1,14 +1,14 @@
-(ns sesquipedalian.t-websockets
+(ns sesquipedalian.test-named-pool
   (:require [midje.sweet :refer :all]
-            [sesquipedalian.websockets :as ws]))
+            [sesquipedalian.named-pool :as ws]))
 
 (def fake-socket :fake-web-socket)
 
-(let [empty (ws/new-name-pool)
+(let [empty (ws/new-named-pool)
       single (ws/add-anonymous-member empty fake-socket)
       single-named (ws/name-member single :test-name fake-socket)
       single-removed (ws/remove-member single-named fake-socket)
-      moar (-> (ws/new-name-pool)
+      moar (-> (ws/new-named-pool)
                (ws/add-anonymous-member 5)
                (ws/name-member :five 5)
                (ws/add-anonymous-member 10)
