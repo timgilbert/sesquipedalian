@@ -36,7 +36,7 @@
 (defn create-new-game! [userlist connect-fn]
   "Create a new game (with a newly-generated ID) containing the users from userlist.
   Call connect-fn with each [username channel] pair."
-  nil)
+  (named-pool/map-to-named-members @socket-pool userlist connect-fn))
 
 (defn available-players []
   (let [named-channels (named-pool/get-named-members @socket-pool)

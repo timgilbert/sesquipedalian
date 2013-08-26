@@ -28,6 +28,7 @@
         username (:username data)]
     (lobby/name-channel! channel username)
     (debug "data:" data)
+    (debug "users:" (lobby/available-players))
     (when-let [users (lobby/available-players)]
       (lobby/create-new-game! users send-redirect))))
 
@@ -40,12 +41,12 @@
                             (waiting-function data channel)))
     (on-close channel (fn [status]
                         (info channel "closed, status" status)
-                        (lobby/remove-channel! channel channel)))))
+                        (lobby/remove-channel! channel)))))
 
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))
   (GET "/game/:id" [] (file-response "resources/public/game.html"))
-  (GET "/ws/lobby" [] ws-lobby-handler lobby-waiting)
+  (GET "/ws/lobby" [] (partial ws-lobby-handler lobby-waiting))
 
   (GET "/ws/MOCK/lobby" [] (partial ws-lobby-handler mock/lobby-waiting))
   (GET "/ws/MOCK/game"  [] (partial ws-lobby-handler mock/game-join))

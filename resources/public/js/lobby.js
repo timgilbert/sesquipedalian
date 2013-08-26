@@ -13,7 +13,7 @@
 
     $('#join-game').click(function(evt) {
       var username = $('#username').val();
-      var socket = new WebSocket('ws://localhost:9899/ws/MOCK/lobby');
+      var socket = new WebSocket('ws://localhost:9899/ws/lobby');
       disableButton('Waiting...');
 
       socket.onopen = function() {
