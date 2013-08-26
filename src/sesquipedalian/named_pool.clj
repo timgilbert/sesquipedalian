@@ -50,4 +50,8 @@
   (named name))
 
 (defn map-to-named-members [[anon named] names f & args]
-  [anon (map f (subset-of named names))])
+  "For each name n mapping to a member of the pool, call (f n (get-named-member pool n) args).
+  Return a map from n to the return value of f."
+  (into {}
+    (for [[n v] named :when (names n)]
+      [n (f n v args)])))

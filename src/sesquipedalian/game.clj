@@ -15,4 +15,8 @@
     (take amount random)))
 
 (defn create-game [game-id userlist]
-  {:letters (get-letter-assortment letters-per-game)})
+  {:id game-id
+   :userlist userlist
+   :letters (get-letter-assortment letters-per-game)})
+
+

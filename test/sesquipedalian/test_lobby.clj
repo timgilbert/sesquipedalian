@@ -1,5 +1,6 @@
 (ns sesquipedalian.test-lobby
-  (:require [midje.sweet :refer :all]
+  (:require [clojure.tools.logging :refer [debug]]
+            [midje.sweet :refer :all]
             [sesquipedalian.lobby :as lobby]))
 
 (facts "about lobby"
@@ -32,6 +33,9 @@
     (lobby/available-game?) => true
     (lobby/available-players) => #{"Alice" "Bob" "Chuck"})
 
+  (defn  test-request [& args]
+    (debug args)
+    (str args))
 
   (fact "constructing games"
     (lobby/reset-lobby!)
@@ -44,5 +48,7 @@
     (lobby/name-channel! :fake-charles-socket "Chuck")
 
     (lobby/available-players) => #{"Alice" "Bob" "Chuck"}
-        ;; TODO: create game
+
+    (let [players (lobby/available-players)]
+      (lobby/create-new-game! players test-request))
 ))
