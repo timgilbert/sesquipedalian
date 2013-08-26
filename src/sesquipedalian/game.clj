@@ -5,7 +5,7 @@
 ; cf
 (def every-consonant (set "BCDFGHJKLMNPQRSTVWXZ"))
 (def every-vowel (set "AEIOUY"))
-(def every-letter (union every-consonant every-vowel))
+(def every-letter (map str (union every-consonant every-vowel)))
 
 (def letters-per-game 15)
 

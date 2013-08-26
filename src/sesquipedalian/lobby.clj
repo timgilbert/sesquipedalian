@@ -53,20 +53,3 @@
   "Return true if there are enough connected users to form a game"
   (not (nil? (available-players))))
 
-(defn get-complete-game! [waiting-room]
-  (let [users-in-game (take max-users-per-game @waiting-room)]
-    (if (< (count @waiting-room) min-users-per-game)
-      nil
-      (do
-        (info "Creating game: " users-in-game)
-        (reset! waiting-room [])        ;; BUG if (count @waiting-room) > max-users
-        (make-new-game users-in-game)))))
-
-(let [waiting-room (atom [])]
-  (defn user-ready [{username :username}]
-    (swap! waiting-room #(conj % username))
-    (info "ready: " username)
-    (get-complete-game! waiting-room)))
-
-; (defn new-game [userlist]
-;   {:letters (get-letter-assortment letters-per-game)})

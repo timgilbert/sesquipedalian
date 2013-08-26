@@ -54,4 +54,5 @@
   Return a map from n to the return value of f."
   (into {}
     (for [[n v] named :when (names n)]
-      [n (f n v args)])))
+      [n
+       (f n v args)])))

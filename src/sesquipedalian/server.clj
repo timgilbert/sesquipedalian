@@ -18,9 +18,10 @@
 
 (def clients (atom {}))                 ; a hub, a map of client => sequence number
 
-(defn send-redirect [game-id username channel]
+(defn send-redirect [username channel & [game]]
   "Send a JSON packet down the channel which tells the user to redirect to a game page"
-  (send! channel (json-str {:id game-id})))
+  (debug "redir, g:" "u:" username "ch:" channel "g:" game)
+  (send! channel (json-str {:id game})))
 
 (defn lobby-waiting [msg channel]
   "Called when a user indicates they are waiting for a game"
