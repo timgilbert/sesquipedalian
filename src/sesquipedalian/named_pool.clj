@@ -5,11 +5,21 @@
 
 ;; TODO: turn this into a record type
 
-(defn- make-name-pool [anons named] [anons named])
+(defn new-named-pool []
+  "Returns a new empty pool, with no named or anonymous members."
+  [#{} {}])
+
+(defn get-anonymous-members [[anon named]] anon)
+
+(defn get-named-members [[anon named]] named)
 
 (defn present? [member coll]
   "Return true is member is present in (seq-like) coll"
   (not (empty? (filter #(= % member) coll))))
+
+(defn anonymous? [[anon named] value]
+  "Return true if value is present in anonymous pool"
+  (present? value anon))
 
 (defn find-key-for [m value]
   "Search the map m for a value value. If found, return the corresponding key
@@ -19,14 +29,6 @@
 (defn subset-of [m name-set]
   "Select the subset of the map m whose keys are in the set name-set"
   (hash-map (for [[k v] m :when (name-set k)] [k v])))
-
-(defn new-named-pool []
-  "Returns a new empty pool, with no named or anonymous members."
-  (make-name-pool #{} {}))
-
-(defn get-anonymous-members [[anon named]] anon)
-
-(defn get-named-members [[anon named]] named)
 
 (defn add-anonymous-member [[anon named] new-item]
   {:pre [(not (present? new-item anon))]}   ; new-item not already in ano n

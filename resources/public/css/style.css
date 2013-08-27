@@ -1,5 +1,9 @@
 /* style.css */
 
+.hidden {
+  display: none;
+}
+
 ul.letters {
   overflow: auto;
   list-style-type: none;

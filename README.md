@@ -22,7 +22,17 @@ users join the browser should redirect each user to /game/XYZ.
 
 ## BUGS
 
-Currently only the last user is redirected to /game/XYZ.
+Plentiful and mysterious.
+
+## Mock Driver
+
+For testing, clients should connect to `/ws/MOCK/lobby` or `/ws/MOCK/game`.
+Clients connected to these sockets will be able to trigger messages to the
+connected sockets by sending async GET/POST requests to `/ws/MOCK/driver`.
+This should allow the client and server code to be worked on more or less
+randomly.
+
+Details TBD.
 
 ## Not sure about
 
@@ -32,9 +42,19 @@ Alternately, session cookie with username or something?
 
 ## TODO:
 
+- More sensible JSON format for messages
 - Back-end in Mongo or whatnot
 - Script to store dict.txt in that, maybe based on [SCOWL][scowl].
 - Integration with NYT regi account
+- Profanity filter and other tragedy of the commons considerations
+
+Lobby reflow
+- First users identify themselves, then they are in the lobby.  There should
+  be chat in the lobby.  Users can also indicate "join game" separately.
+- Users in lobby will receive messages about user joining / leaving lobby,
+  winning / losing games, and chatting
+- Therefore we'll probably want a separate "about / landing page" which also
+  has a login or user form.
 
 # Data flow
 

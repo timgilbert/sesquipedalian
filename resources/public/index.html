@@ -9,14 +9,43 @@
 </head>
 
   <body>
-    <section>
-      <h1>Sesquipedalian: lobby</h1>
-      <div id="history-wrap">
-        <ul id="history"></ul>
-      </div>
+    <h1>Sesquipedalian: lobby</h1>
+    <div id="history-wrap">
+      <ul id="history"></ul>
+    </div>
+
+    <section id="login-section">
       <input id="username" placeholder="Enter your username"/>
-      <button id="join-game">Join Game</button>
+      <button id="login">Log In</button>
     </section>
+
+    <section id="events-section" hidden>
+      <h2>Events</h2>
+
+      <p id="event-log">
+        Hello
+      </p>
+
+      <div class="chat">
+        <input id="chat-text" placeholder="Enter a phrase to chat"/>
+        <button id="chat">Send</button>
+      </div>
+
+      <button id="join">Join a Game</button>
+    </section>
+
+    <section id="userlist-section" hidden>
+      <h2>User list</h2>
+      <ul id="users">
+      </ul>
+    </section>
+
+    <div id="templates" hidden>
+      <p class="message"></p>
+      <ul>
+        <li class="user"></li>
+      </ul>
+    </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>

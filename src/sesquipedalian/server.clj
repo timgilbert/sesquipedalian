@@ -13,11 +13,6 @@
             [clojure.data.json :refer [json-str read-json]]
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
 
-;; TODO
-; when game appears, send it to all users
-
-(def clients (atom {}))                 ; a hub, a map of client => sequence number
-
 (defn send-redirect [username channel & [game]]
   "Send a JSON packet down the channel which tells the user to redirect to a game page"
   (debug "redir, g:" "u:" username "ch:" channel "g:" game)
@@ -33,6 +28,44 @@
     (when-let [users (lobby/available-players)]
       (lobby/create-new-game! users send-redirect))))
 
+(defn broadcast-json [data]
+  "For each user with name n and connection c, call (f n c args) and return a
+  map from n to the function result"
+  (let [json (json-str data)
+        f (fn [username channel & args]
+            (debug "Sending" json "to" username "ch" channel)
+            (send! channel json))]
+    (debug "Broadcast:" json "to" (lobby/get-connected-usernames))
+    (lobby/map-to-named f)))
+
+(defn broadcast-connection [username]
+  (broadcast-json {:action "joined-lobby", :username username}))
+
+(defn login-or-fail [data channel]
+  "Called when a user has connected (via channel) but not yet logged in"
+  (let [{username :username, action :action} (read-json data)]
+    (if (or (nil? username) (not= action "login"))
+      (info "Got weird response waiting for login:" data)
+      (do
+        (lobby/name-channel! channel username)
+        (info "User connected:" username)
+        (broadcast-connection username)))))
+
+(defn chat [data channel]
+  (info "chatting" data))
+
+(defn join-game [data channel]
+  (info "chatting" data))
+
+(defn lobby-dispatch [json channel]
+  (let [data (read-json json)
+        action (:action data)]
+    (cond
+      (lobby/anonymous? channel) (login-or-fail data channel)
+      (= action "chat") (chat channel data)
+      (= action "join") (join-game channel)
+      :else (info "discarding weird data" data))))
+
 (defn ws-lobby-handler [waiting-function request]
   "Per-socket handler for requests to /ws/lobby"
   (with-channel request channel
@@ -47,10 +80,10 @@
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))
   (GET "/game/:id" [] (file-response "resources/public/game.html"))
-  (GET "/ws/lobby" [] (partial ws-lobby-handler lobby-waiting))
+  (GET "/ws/lobby" [] (partial ws-lobby-handler lobby-dispatch))
 
-  (GET "/ws/MOCK/lobby" [] (partial ws-lobby-handler mock/lobby-waiting))
-  (GET "/ws/MOCK/game"  [] (partial ws-lobby-handler mock/game-join))
+  (GET "/ws/MOCK/lobby" [] (partial ws-lobby-handler mock/lobby-dispatch))
+  (GET "/ws/MOCK/game"  [] (partial ws-lobby-handler mock/lobby-dispatch))
   (route/files "" {:root "resources/public"})
   (route/not-found "<p>Page not found.</p>" ))
 
