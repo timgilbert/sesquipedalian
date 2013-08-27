@@ -13,21 +13,6 @@
             [clojure.data.json :refer [json-str read-json]]
             [org.httpkit.server :refer [send! on-receive on-close with-channel run-server]]))
 
-(defn send-redirect [username channel & [game]]
-  "Send a JSON packet down the channel which tells the user to redirect to a game page"
-  (debug "redir, g:" "u:" username "ch:" channel "g:" game)
-  (send! channel (json-str {:id game})))
-
-(defn lobby-waiting [msg channel]
-  "Called when a user indicates they are waiting for a game"
-  (let [data (read-json msg)
-        username (:username data)]
-    (lobby/name-channel! channel username)
-    (debug "data:" data)
-    (debug "users:" (lobby/available-players))
-    (when-let [users (lobby/available-players)]
-      (lobby/create-new-game! users send-redirect))))
-
 (defn broadcast-json [data]
   "For each user with name n and connection c, call (f n c args) and return a
   map from n to the function result"
@@ -41,9 +26,9 @@
 (defn broadcast-connection [username]
   (broadcast-json {:action "joined-lobby", :username username}))
 
-(defn login-or-fail [data channel]
+(defn login-or-fail [channel data]
   "Called when a user has connected (via channel) but not yet logged in"
-  (let [{username :username, action :action} (read-json data)]
+  (let [{username :username, action :action} data]
     (if (or (nil? username) (not= action "login"))
       (info "Got weird response waiting for login:" data)
       (do
@@ -51,19 +36,28 @@
         (info "User connected:" username)
         (broadcast-connection username)))))
 
-(defn chat [data channel]
-  (info "chatting" data))
+(defn chat [channel data]
+  (info "chatting" data)
+  (broadcast-json {:action "chat", :username (lobby/who-owns channel)
+                   :text (:text data)}))
 
-(defn join-game [data channel]
-  (info "chatting" data))
+(defn send-redirect [username channel & [[game]]]
+  "Send a JSON packet down the channel which tells the user to redirect to a game page"
+  (debug "redirect u:" username "g:" game)
+  (send! channel (json-str {:action "game", :game game})))
+
+(defn join-game [channel data]
+  (info "joining" data)
+  (when-let [users (lobby/available-players)]
+    (lobby/create-new-game! users send-redirect)))
 
 (defn lobby-dispatch [json channel]
   (let [data (read-json json)
         action (:action data)]
     (cond
-      (lobby/anonymous? channel) (login-or-fail data channel)
+      (lobby/anonymous? channel) (login-or-fail channel data)
       (= action "chat") (chat channel data)
-      (= action "join") (join-game channel)
+      (= action "join") (join-game channel data)
       :else (info "discarding weird data" data))))
 
 (defn ws-lobby-handler [waiting-function request]

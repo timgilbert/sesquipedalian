@@ -4,7 +4,7 @@
     $('#login').click(function(evt) {
       var username = $('#username').val();
       var socket = new WebSocket('ws://localhost:9899/ws/MOCK/lobby');
-      //var socket = new WebSocket('ws://localhost:9899/ws/lobby');
+      // var socket = new WebSocket('ws://localhost:9899/ws/lobby');
       disableLogin('Waiting for login...');
 
       socket.onopen = function() {
@@ -44,7 +44,7 @@
         appendEvent("User " + data.username + " joined the room.");
       break;
       case 'chat':
-        appendEvent(data.username + ": " + data.message);
+        appendEvent(data.username + ": " + data.text);
       break;
       case 'game':
         redirectToGamePage(data);
@@ -87,7 +87,7 @@
   }
 
   function redirectToGamePage(data) {
-    var url = '/game/' + data.id;
+    var url = '/game/' + data.game.id;
     console.log('redir:', url, data);
     $('#event-log').append('<a href="' + url + '">REDIRECT TO GAME PAGE</a>');
     //window.location.href = url;

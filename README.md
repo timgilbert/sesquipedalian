@@ -36,46 +36,58 @@ Details TBD.
 
 ## Not sure about
 
-Should redirect from lobby to game be a form post with username in it?
-
 Alternately, session cookie with username or something?
 
 ## TODO:
 
-- More sensible JSON format for messages
+Should likely rework page flow thusly:
+* User arrives on site, sees landing page with login screen
+* Once user logs in, redirects to lobby with chat
+* User can see other users, create game, invite users in
+* Users in lobby will receive messages about user joining / leaving lobby,
+  winning / losing games, and chatting
+** Need to work out network flow for this
+* User can indicate "join random game" and be put on a waiting
+  list; when enough users are in waiting list, game starts (current behavior)
+* Lobby and game page are at the same URL, separated by client display
+
 - Back-end in Mongo or whatnot
 - Script to store dict.txt in that, maybe based on [SCOWL][scowl].
 - Integration with NYT regi account
 - Profanity filter and other tragedy of the commons considerations
 
-Lobby reflow
-- First users identify themselves, then they are in the lobby.  There should
-  be chat in the lobby.  Users can also indicate "join game" separately.
-- Users in lobby will receive messages about user joining / leaving lobby,
-  winning / losing games, and chatting
-- Therefore we'll probably want a separate "about / landing page" which also
-  has a login or user form.
-
 # Data flow
 
-Here I'll try to document the network traffic of the game.
+Here I'll try to document the existing network traffic of the game.
+
+Most packets back and forth are of the form `{"action": "action-name" ...}`
 
 ## Lobby page
 
-1. User enters lobby, types username, hits "join"
+1. User enters lobby, types username, hits "login"
 
 2. Client opens web socket to ws://localhost:9899/ws/lobby
 
-3. Server hangs out waiting for 3 users to join (keeping sockets open)
+3. Client sends `{"action": "login", "username": the-name}`
 
-4. When server sees 3 users, it sends json to each one over the socket.
+4. Client hangs out in lobby, chatting
+   * May periodically send or receive chat messages, which look like this:
+     `{"action": "chat", "username": name, "text": "This is what I typed"}`
+   ** User's chat messages are broadcast back to themselves
+   * Also receives state-change notifications for other users
 
-   The json looks roughtly like `{"id": 123}`, maybe with other stuff in it.
-   Specifically, down the road it might have some kind of token generated
-   by the server or a similar authentication method.
+5. Eventually a client will hit "Join Game" - sends `{"action": "join"}`.
 
-5. When client gets the json packet, it constructs a URL based on the game ID
+6. When server sees 3 users, it sends json to each one over the socket.
+
+   The json looks roughly like `{"action": "game", id": 123}`, with other
+   stuff in it.
+
+7. When client gets the json packet, it constructs a URL based on the game ID
    and redirects the browser to that ID (eg, /game/123).
+
+   *Note*: above behavior should probably change to be a js-based refresh
+   of the page to show the game UI, rather than a page reload.
 
 ## Game page
 

@@ -17,25 +17,29 @@
   "Return true is member is present in (seq-like) coll"
   (not (empty? (filter #(= % member) coll))))
 
-(defn anonymous? [[anon named] value]
-  "Return true if value is present in anonymous pool"
-  (present? value anon))
-
 (defn find-key-for [m value]
   "Search the map m for a value value. If found, return the corresponding key
   in m.  Otherwise, return nil."
   (first (for [[k v] m :when (= v value)] k)))
+
+(defn anonymous? [[anon named] value]
+  "Return true if value is present in anonymous pool"
+  (present? value anon))
+
+(defn who-owns [[anon named] value]
+  "Return true if value is present in anonymous pool"
+  (find-key-for named value))
 
 (defn subset-of [m name-set]
   "Select the subset of the map m whose keys are in the set name-set"
   (hash-map (for [[k v] m :when (name-set k)] [k v])))
 
 (defn add-anonymous-member [[anon named] new-item]
-  {:pre [(not (present? new-item anon))]}   ; new-item not already in ano n
+  {:pre [(not (present? new-item anon))]}    ; new-item not already in ano n
   [(conj anon new-item) named])
 
 (defn name-member [[anon named] name item]
-  {:pre [(not (named name))                       ; name does not already exist
+  {:pre [(not (named name))                  ; name does not already exist
          (present? item anon)]}              ; item in anon already
   [(disj anon item)
    (assoc named name item)])

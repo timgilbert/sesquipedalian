@@ -33,6 +33,10 @@
 (defn remove-channel! [channel]
   (swap! socket-pool named-pool/remove-member channel))
 
+(defn who-owns [channel]
+  "Return the username associated with the channel, or nil"
+  (named-pool/who-owns @socket-pool channel))
+
 (defn anonymous? [channel]
   "Return true is this channel has not yet been named"
   (named-pool/anonymous? @socket-pool channel))
