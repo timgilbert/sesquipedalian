@@ -28,7 +28,7 @@
 
 (defn login-or-fail [channel data]
   "Called when a user has connected (via channel) but not yet logged in"
-  (let [{username :username, action :action} data]
+  (let [{:keys [username action]} data]
     (if (or (nil? username) (not= action "login"))
       (info "Got weird response waiting for login:" data)
       (do

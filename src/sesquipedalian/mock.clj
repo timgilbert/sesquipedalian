@@ -35,5 +35,5 @@
                                 :userlist ["Alice" "Bob" "Charles"]}})
       "login" (respond channel {:action "joined-lobby", :username "Bob"})
       "chat"  (respond channel {:action "chat", :username "Bob",
-                                :message "Mock chatting!"}))))
+                                :text "Mock chatting!"}))))
 
