@@ -14,25 +14,33 @@ You will need [Leiningen][lein] 1.7.0 or above installed.
 To start a web server for the application:
 
     $ lein run
-    10:13:10 INFO  sesquipedalian.server - server started on http://localhost:9899/
+    12:58:53 INFO  sesquipedalian.server - Live server: http://localhost:9899/
+    12:58:53 INFO  sesquipedalian.server - Mock server: http://localhost:9899/?mock=1
 
-Once the above line appears, the server is serving on [http://localhost:9899/][local].
-You can open mutliple browser tabs, enter a username, and hit "join game" - once three
-users join the browser should redirect each user to /game/XYZ.
+Once the above line appears, the server is serving on http://localhost:9899/.
+
+You can open mutliple browser tabs, enter a username, and hit "login" on
+each one. From the lobby, hit "join game" to join a game - once three
+users join, their browsers should automatically redirect to /game/XYZ.
+
+## Mock Driver
+
+If you append ?mock=1 to the URL (second link above) you'll hit the mock server
+interface. In this mode, queries to the server will always product the same
+results and there won't be communication between multiple clients (this is
+meant to help with testing the front end).
+
+On the websocket side, the mock interface lives at `/ws/MOCK/lobby` instead
+of `/ws/lobby`. Clients connected to the mock sockets will be able to trigger
+messages to the connected sockets by sending async GET/POST requests to
+`/ws/MOCK/driver`. This should allow the client and server code to be worked
+on more or less independently.
+
+Details about the driver TBD.
 
 ## BUGS
 
 Plentiful and mysterious.
-
-## Mock Driver
-
-For testing, clients should connect to `/ws/MOCK/lobby` or `/ws/MOCK/game`.
-Clients connected to these sockets will be able to trigger messages to the
-connected sockets by sending async GET/POST requests to `/ws/MOCK/driver`.
-This should allow the client and server code to be worked on more or less
-randomly.
-
-Details TBD.
 
 ## Not sure about
 
@@ -55,6 +63,14 @@ Should likely rework page flow thusly:
 - Script to store dict.txt in that, maybe based on [SCOWL][scowl].
 - Integration with NYT regi account
 - Profanity filter and other tragedy of the commons considerations
+
+## Long-term plans
+
+- Leaderboard / scores etc
+- Integration with rest of NYT site / games
+- Users in lobby can initiate private games, invite users, etc
+- Badges tied to comment profiles?
+- More social aspects: friend lists, etc
 
 # Data flow
 

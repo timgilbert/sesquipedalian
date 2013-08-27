@@ -3,8 +3,11 @@
 
     $('#login').click(function(evt) {
       var username = $('#username').val();
-      var socket = new WebSocket('ws://localhost:9899/ws/MOCK/lobby');
-      // var socket = new WebSocket('ws://localhost:9899/ws/lobby');
+      var socketUrl = 'ws://localhost:9899/ws/lobby';
+      if (isMock()) {
+        socketUrl = 'ws://localhost:9899/ws/MOCK/lobby';
+      }
+      var socket = new WebSocket(socketUrl);
       disableLogin('Waiting for login...');
 
       socket.onopen = function() {
@@ -52,6 +55,10 @@
     }
   }
 
+  function isMock() {
+    return (window.location.href.indexOf('mock=1') > -1);
+  }
+
   function appendEvent(text) {
     var $message = $("#templates .message").clone().text(text);
     $('#event-log').append($message);
@@ -88,6 +95,9 @@
 
   function redirectToGamePage(data) {
     var url = '/game/' + data.game.id;
+    if (isMock()) {
+      url += '?mock=1';
+    }
     console.log('redir:', url, data);
     $('#event-log').append('<a href="' + url + '">REDIRECT TO GAME PAGE</a>');
     //window.location.href = url;

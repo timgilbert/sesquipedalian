@@ -73,6 +73,7 @@
 
 (defroutes all-routes
   (GET "/"         [] (file-response "resources/public/index.html"))
+  (GET "/mock"     [] (file-response "resources/public/index.html"))
   (GET "/game/:id" [] (file-response "resources/public/game.html"))
   (GET "/ws/lobby" [] (partial ws-lobby-handler lobby-dispatch))
 
@@ -96,4 +97,5 @@
                  site
                  wrap-reload
                  wrap-request-logging) {:port port})
-    (info "server started on" (format "http://localhost:%d/" port))))
+    (info "Live server:" (format "http://localhost:%d/" port))
+    (info "Mock server:" (format "http://localhost:%d/?mock=1" port))))
